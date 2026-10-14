@@ -1,14 +1,8 @@
-
 package tn.esprit.tpautoloc.domain;
-import jakarta.persistence.*;
-
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
+import java.util.*;
 
 @Entity
 @Table(name = "equipement")
@@ -17,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Equipement {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEquipement;
@@ -24,4 +19,6 @@ public class Equipement {
     private String libelle;
 
 
+    @ManyToMany(mappedBy = "equipements")
+    private List<Vehicule> vehicules = new ArrayList<>();
 }

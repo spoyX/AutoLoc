@@ -1,16 +1,9 @@
-
 package tn.esprit.tpautoloc.domain;
-import jakarta.persistence.*;
-
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import tn.esprit.tpautoloc.domain.enums.*;
+import lombok.*;
+import tn.esprit.tpautoloc.domain.enums.StatutReservation;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -20,16 +13,28 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idReservation;
-    private BigDecimal montant;
+
     private LocalDate dateDebut;
     private LocalDate dateFin;
 
+    @Enumerated(EnumType.STRING)
     private StatutReservation statut;
 
-    private String decription;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
 
 
+    @ManyToOne
+    @JoinColumn(name = "vehicule_id")
+    private Vehicule vehicule;
+
+
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
+    private Contrat contrat;
 }

@@ -1,17 +1,10 @@
-
 package tn.esprit.tpautoloc.domain;
-import jakarta.persistence.*;
-
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Table(name = "contrat")
@@ -20,14 +13,20 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Contrat {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idContrat;
 
-    private BigDecimal montantTotal;
-    private boolean Valid;
-
     private LocalDate dateSignature;
+    private BigDecimal montantTotal;
+    private Boolean valide;
 
 
+    @OneToOne
+    @JoinColumn(name = "reservation_id", unique = true)
+    private Reservation reservation;
+
+    @OneToMany(mappedBy = "contrat", cascade = CascadeType.ALL)
+    private List<Paiement> paiements = new ArrayList<>();
 }

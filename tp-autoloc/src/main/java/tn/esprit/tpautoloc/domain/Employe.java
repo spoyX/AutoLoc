@@ -1,19 +1,8 @@
-
 package tn.esprit.tpautoloc.domain;
-import jakarta.persistence.*;
-
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import tn.esprit.tpautoloc.domain.enums.RoleEmploye;
-
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "employe")
@@ -22,16 +11,19 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employe {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEmploye;
 
     private String nom;
     private String prenom;
+
+    @Enumerated(EnumType.STRING)
     private RoleEmploye role;
 
 
-    private LocalDate dateSignature;
-
-
+    @ManyToOne
+    @JoinColumn(name = "agence_id")
+    private Agence agence;
 }
