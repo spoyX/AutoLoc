@@ -1,5 +1,6 @@
 package tn.esprit.tpautoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -23,5 +24,6 @@ public class Maintenance {
 
     @ManyToOne
     @JoinColumn(name = "vehicule_id")
+    @JsonBackReference("vehicule-maintenances")
     private Vehicule vehicule;
 }

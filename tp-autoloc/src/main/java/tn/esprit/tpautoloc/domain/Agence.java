@@ -1,5 +1,6 @@
 package tn.esprit.tpautoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.*;
@@ -23,6 +24,7 @@ public class Agence {
 
 
     @OneToMany(mappedBy = "agence", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Employe> employes = new ArrayList<>();
 
 

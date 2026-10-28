@@ -7,7 +7,10 @@ import tn.esprit.tpautoloc.domain.*;
 import tn.esprit.tpautoloc.domain.enums.CategorieVehicule;
 import tn.esprit.tpautoloc.domain.enums.ModePaiement;
 import tn.esprit.tpautoloc.domain.enums.StatutVehicule;
+import tn.esprit.tpautoloc.exception.ResourceNotFoundException;
 import tn.esprit.tpautoloc.repository.*;
+import tn.esprit.tpautoloc.service.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
@@ -40,6 +43,18 @@ class TpAutolocApplicationTests {
 
     @Autowired
     private IPaiementRepository paiementRepository;
+    @Autowired
+    private IAgenceService agenceService;
+    @Autowired
+    private IClientService clientService;
+    @Autowired
+    private IVehiculeService vehiculeService;
+    @Autowired
+    private IMaintenanceService maintenanceService;
+    @Autowired
+    private IEquipementService equipementService;
+    @Autowired
+    private IPaiementService paiementService;
 
     @Test
     void contextLoads() {
@@ -161,7 +176,7 @@ class TpAutolocApplicationTests {
         clientRepository.deleteById(id2);
         System.out.println("→ deleteById(" + id2 + ") effectué (client 2)");
 
-        
+
         boolean existeApres2 = clientRepository.existsById(id2);
         System.out.println("→ existsById(" + id2 + ") après suppression : " + existeApres2);
         assertFalse(existeApres2);
@@ -173,6 +188,7 @@ class TpAutolocApplicationTests {
 
         System.out.println("========== FIN TEST CLIENT ==========\n");
     }
+
     @Test
     public void testVehiculeRepository() {
         System.out.println("\n========== TEST VEHICULE REPOSITORY ==========");
@@ -216,6 +232,7 @@ class TpAutolocApplicationTests {
 
         System.out.println("========== FIN TEST VEHICULE ==========\n");
     }
+
     @Test
     public void testExerciceAutonome() {
         System.out.println("\n========== EXERCICE AUTONOME ==========");
@@ -288,10 +305,132 @@ class TpAutolocApplicationTests {
         System.out.println("→ Toutes les entités ont été supprimées avec succès");
         System.out.println("========== FIN EXERCICE AUTONOME ==========\n");
     }
+
+    // ══════════════════════════════════════════════════════════
+    // PARTIE 2 — TEST : AgenceService
+    // ══════════════════════════════════════════════════════════
+    @Test
+    public void testAgenceService() {
+        System.out.println("\n========== TEST AGENCE SERVICE ==========");
+
+        // 1. Créer une instance
+        Agence agence = new Agence();
+        agence.setNom("AutoLoc Tunis");
+        agence.setVille("Tunis");
+        agence.setAdresse("12 Avenue Habib Bourguiba");
+        agence.setTelephone("71234567");
+        System.out.println("→ Agence créée : " + agence);
+
+        // 2. Enregistrer via le service
+        Agence saved = agenceService.create(agence);
+        System.out.println("→ Après create() : " + saved);
+        System.out.println("   → ID généré : " + saved.getIdAgence());
+        assertNotNull(saved);
+        assertNotNull(saved.getIdAgence());
+
+        // 3. findAll()
+        List<Agence> toutes = agenceService.findAll();
+        System.out.println("→ findAll() : " + toutes.size() + " agence(s)");
+        toutes.forEach(a -> System.out.println("     " + a));
+        assertFalse(toutes.isEmpty());
+
+        // 4. findById()
+        Agence trouvee = agenceService.findById(saved.getIdAgence());
+        System.out.println("→ findById(" + saved.getIdAgence() + ") : " + trouvee);
+        assertNotNull(trouvee);
+        assertEquals("AutoLoc Tunis", trouvee.getNom());
+
+        // 5. count() → via findAll().size()
+        long total = agenceService.findAll().size();
+        System.out.println("→ count() : " + total);
+        assertTrue(total > 0);
+
+        // 6. update()
+        saved.setVille("Sfax");
+        Agence modifiee = agenceService.update(saved.getIdAgence(), saved);
+        System.out.println("→ Après update() : " + modifiee);
+        assertEquals("Sfax", modifiee.getVille());
+
+        // 7. deleteById()
+        Long id = saved.getIdAgence();
+        agenceService.deleteById(id);
+        System.out.println("→ deleteById(" + id + ") effectué");
+
+        // 8. Vérifier que findById lève ResourceNotFoundException
+        assertThrows(ResourceNotFoundException.class,
+                () -> agenceService.findById(id));
+        System.out.println("→ findById(" + id + ") lève bien ResourceNotFoundException ✅");
+
+        System.out.println("========== FIN TEST AGENCE ==========\n");
+    }
+    // TEST CLIENT
+    @Test
+    public void testClientService() {
+        System.out.println("\n========== TEST CLIENT SERVICE ==========");
+
+        // 1. Créer deux clients
+        Client c1 = new Client();
+        c1.setNom("Ben Ali");
+        c1.setPrenom("Ahmed");
+        c1.setEmail("ahmed.benali@email.com");
+        c1.setTelephone("20123456");
+        c1.setNumPermis("P123456");
+        c1.setDateInscription(LocalDate.now());
+
+        Client c2 = new Client();
+        c2.setNom("Trabelsi");
+        c2.setPrenom("Sarra");
+        c2.setEmail("sarra.trabelsi@email.com");
+        c2.setTelephone("98765432");
+        c2.setNumPermis("P654321");
+        c2.setDateInscription(LocalDate.now());
+
+        // 2. Enregistrer via le service
+        Client saved1 = clientService.create(c1);
+        Client saved2 = clientService.create(c2);
+        System.out.println("→ Client 1 sauvé : " + saved1);
+        System.out.println("→ Client 2 sauvé : " + saved2);
+        assertNotNull(saved1.getIdClient());
+        assertNotNull(saved2.getIdClient());
+
+        // 3. findAll()
+        List<Client> clients = clientService.findAll();
+        System.out.println("→ findAll() : " + clients.size() + " client(s)");
+        clients.forEach(cl -> System.out.println("     " + cl));
+        assertTrue(clients.size() >= 2);
+
+        // 4. findById()
+        Client trouve = clientService.findById(saved1.getIdClient());
+        System.out.println("→ findById(" + saved1.getIdClient() + ") : " + trouve);
+        assertNotNull(trouve);
+        assertEquals("Ben Ali", trouve.getNom());
+
+        // 5. count()
+        long total = clientService.findAll().size();
+        System.out.println("→ count() : " + total);
+        assertTrue(total >= 2);
+
+        // 6. deleteById() les deux clients
+        Long id1 = saved1.getIdClient();
+        Long id2 = saved2.getIdClient();
+
+        clientService.deleteById(id1);
+        System.out.println("→ deleteById(" + id1 + ") effectué (client 1)");
+        assertThrows(ResourceNotFoundException.class,
+                () -> clientService.findById(id1));
+
+        clientService.deleteById(id2);
+        System.out.println("→ deleteById(" + id2 + ") effectué (client 2)");
+        assertThrows(ResourceNotFoundException.class,
+                () -> clientService.findById(id2));
+
+        // 7. count() après suppression
+        long totalApres = clientService.findAll().size();
+        System.out.println("→ count() après suppressions : " + totalApres);
+        assertTrue(totalApres < total);
+
+        System.out.println("========== FIN TEST CLIENT ==========\n");
+    }
+
+
 }
-
-
-
-
-
-

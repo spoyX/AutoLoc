@@ -25,5 +25,6 @@ public class Employe {
 
     @ManyToOne
     @JoinColumn(name = "agence_id")
+
     private Agence agence;
 }
